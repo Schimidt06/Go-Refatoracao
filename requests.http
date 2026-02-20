@@ -1,0 +1,11 @@
+### Criar Item - Leitor de Cartões alienígenas
+POST http://localhost:8080/itens/create
+Content-Type: application/json
+
+{
+    "nome": "Leitor de Cartões alienígenas",
+    "codigo": "ETI047",
+    "descricao": "Leitor de cartões multi-formato interplanetário",
+    "preco": 200,
+    "quantidade": 30
+}

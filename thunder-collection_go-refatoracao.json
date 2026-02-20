@@ -1,0 +1,33 @@
+{
+    "client": "Thunder Client",
+    "collectionName": "Go Refatoracao",
+    "dateExported": "2026-02-19T10:45:00.000Z",
+    "version": "1.1",
+    "folders": [],
+    "requests": [
+        {
+            "_id": "req-1",
+            "colId": "col-1",
+            "containerId": "",
+            "name": "Criar Item - Leitor de Cartões alienígenas",
+            "url": "http://localhost:8080/itens/create",
+            "method": "POST",
+            "sortNum": 10000,
+            "created": "2026-02-19T10:45:00.000Z",
+            "modified": "2026-02-19T10:45:00.000Z",
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n    \"nome\": \"Leitor de Cartões alienígenas\",\n    \"codigo\": \"ETI047\",\n    \"descricao\": \"Leitor de cartões multi-formato interplanetário\",\n    \"preco\": 200,\n    \"quantidade\": 30\n}",
+                "form": []
+            },
+            "tests": []
+        }
+    ]
+}
