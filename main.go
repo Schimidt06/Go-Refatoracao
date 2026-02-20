@@ -7,26 +7,12 @@ import (
 	"net/http"
 	"strconv"
 
-	model "myapi/models"
-
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
+	"myapi/internal/config"
+	model "myapi/internal/models"
 )
 
-var bd *gorm.DB
-
 func main() {
-	// Conexão com o Postgres (usando host "db" pois o docker-compose cria essa rede)
-	dsn := "host=db user=postgres password=postgres dbname=postgres port=5432 sslmode=disable TimeZone=UTC"
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	if err != nil {
-		log.Fatalf("Erro ao conectar com o BD: %v", err)
-	}
-	bd = db
-
-	// AutoMigrate para criar/ajustar tabelas
-	bd.AutoMigrate(&model.Iten{})
-	bd.AutoMigrate(&model.Cat{})
+	config.ConectaComBancoDeDados()
 
 	// Endpoint raiz
 	http.HandleFunc("/api", indexHandler)
@@ -65,7 +51,7 @@ func listItensHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	var itens []model.Iten
-	if err := bd.Find(&itens).Error; err != nil {
+	if err := config.DB.Find(&itens).Error; err != nil {
 		http.Error(w, "Erro ao buscar itens", http.StatusInternalServerError)
 		return
 	}
@@ -90,7 +76,7 @@ func getItenHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var item model.Iten
-	if err := bd.First(&item, id).Error; err != nil {
+	if err := config.DB.First(&item, id).Error; err != nil {
 		http.Error(w, "Item não encontrado", http.StatusNotFound)
 		return
 	}
@@ -111,7 +97,7 @@ func getItenByCodigoHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	var item model.Iten
 	// Busca o item onde o campo "codigo" é igual ao valor fornecido
-	if err := bd.Where("codigo = ?", cod).First(&item).Error; err != nil {
+	if err := config.DB.Where("codigo = ?", cod).First(&item).Error; err != nil {
 		http.Error(w, "Item não encontrado", http.StatusNotFound)
 		return
 	}
@@ -130,7 +116,7 @@ func createItenHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Erro ao decodificar o item", http.StatusBadRequest)
 		return
 	}
-	if err := bd.Create(&item).Error; err != nil {
+	if err := config.DB.Create(&item).Error; err != nil {
 		http.Error(w, "Erro ao criar o item", http.StatusInternalServerError)
 		return
 	}
@@ -149,7 +135,7 @@ func updateItenHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Erro ao decodificar o item", http.StatusBadRequest)
 		return
 	}
-	if err := bd.Save(&item).Error; err != nil {
+	if err := config.DB.Save(&item).Error; err != nil {
 		http.Error(w, "Erro ao atualizar o item", http.StatusInternalServerError)
 		return
 	}
@@ -172,7 +158,7 @@ func deleteItenHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "ID inválido", http.StatusBadRequest)
 		return
 	}
-	if err := bd.Delete(&model.Iten{}, id).Error; err != nil {
+	if err := config.DB.Delete(&model.Iten{}, id).Error; err != nil {
 		http.Error(w, "Erro ao deletar o item", http.StatusInternalServerError)
 		return
 	}
@@ -189,7 +175,7 @@ func listCategoriasHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	var cats []model.Cat
-	if err := bd.Find(&cats).Error; err != nil {
+	if err := config.DB.Find(&cats).Error; err != nil {
 		http.Error(w, "Erro ao buscar categorias", http.StatusInternalServerError)
 		return
 	}
@@ -214,7 +200,7 @@ func getCategoriaHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var cat model.Cat
-	if err := bd.First(&cat, id).Error; err != nil {
+	if err := config.DB.First(&cat, id).Error; err != nil {
 		http.Error(w, "Categoria não encontrada", http.StatusNotFound)
 		return
 	}
@@ -233,7 +219,7 @@ func createCategoriaHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Erro ao decodificar a categoria", http.StatusBadRequest)
 		return
 	}
-	if err := bd.Create(&cat).Error; err != nil {
+	if err := config.DB.Create(&cat).Error; err != nil {
 		http.Error(w, "Erro ao criar a categoria", http.StatusInternalServerError)
 		return
 	}
@@ -252,7 +238,7 @@ func updateCategoriaHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Erro ao decodificar a categoria", http.StatusBadRequest)
 		return
 	}
-	if err := bd.Save(&cat).Error; err != nil {
+	if err := config.DB.Save(&cat).Error; err != nil {
 		http.Error(w, "Erro ao atualizar a categoria", http.StatusInternalServerError)
 		return
 	}
@@ -275,7 +261,7 @@ func deleteCategoriaHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "ID inválido", http.StatusBadRequest)
 		return
 	}
-	if err := bd.Delete(&model.Cat{}, id).Error; err != nil {
+	if err := config.DB.Delete(&model.Cat{}, id).Error; err != nil {
 		http.Error(w, "Erro ao deletar a categoria", http.StatusInternalServerError)
 		return
 	}
