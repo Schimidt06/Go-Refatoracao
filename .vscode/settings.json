@@ -1,0 +1,32 @@
+{
+    "gitlens.currentLine.enabled": true,
+    "gitlens.currentLine.format": "${author}, ${agoOrDate} • ${message}",
+    "gitlens.currentLine.scrollable": false,
+    "gitlens.currentLine.pullRequests.enabled": false,
+    "gitlens.hovers.currentLine.over": "line",
+    "gitlens.hovers.enabled": true,
+    "gitlens.hovers.currentLine.details": true,
+    "gitlens.hovers.currentLine.changes": true,
+    "gitlens.hovers.annotations.details": true,
+    "gitlens.codeLens.enabled": true,
+    "gitlens.codeLens.recentChange.enabled": true,
+    "gitlens.codeLens.authors.enabled": true,
+    "gitlens.codeLens.scopes": [
+        "document",
+        "containers",
+        "blocks"
+    ],
+    "gitlens.statusBar.enabled": true,
+    "gitlens.statusBar.format": "${author} (${agoOrDate})",
+    "gitlens.statusBar.command": "gitlens.showCommitsInView",
+    "gitlens.graph.minimap.enabled": true,
+    "gitlens.graph.scrollMarkers.enabled": true,
+    "gitlens.views.repositories.autoReveal": true,
+    "gitlens.defaultDateFormat": null,
+    "gitlens.defaultDateStyle": "relative",
+    "gitlens.defaultDateShortFormat": null,
+    "gitlens.views.commits.files.layout": "list",
+    "gitlens.views.commits.showBranchComparison": "working",
+    "gitlens.views.branches.showBranchComparison": "branch",
+    "gitlens.decorations.enabled": true
+}
