@@ -1,0 +1,342 @@
+basePath: /
+definitions:
+  models.Cat:
+    properties:
+      codigo:
+        type: string
+      descricao:
+        type: string
+      id:
+        type: integer
+      nome:
+        type: string
+    type: object
+  models.Iten:
+    properties:
+      codigo:
+        type: string
+      descricao:
+        type: string
+      id:
+        type: integer
+      nome:
+        type: string
+      preco:
+        type: number
+      quantidade:
+        type: integer
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: Esta é uma API de exemplo para o curso de Refatoração em Go.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Go Refatoração API
+  version: "1.0"
+paths:
+  /categorias:
+    get:
+      consumes:
+      - application/json
+      description: Retorna todas as categorias cadastradas no banco de dados
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Cat'
+            type: array
+      summary: Listar todas as categorias
+      tags:
+      - categorias
+  /categorias/create:
+    post:
+      consumes:
+      - application/json
+      description: Cria uma categoria baseada no JSON fornecido
+      parameters:
+      - description: Dados da Categoria
+        in: body
+        name: cat
+        required: true
+        schema:
+          $ref: '#/definitions/models.Cat'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Cat'
+        "400":
+          description: Erro ao decodificar a categoria
+          schema:
+            type: string
+        "500":
+          description: Erro ao criar a categoria
+          schema:
+            type: string
+      summary: Criar uma nova categoria
+      tags:
+      - categorias
+  /categorias/delete:
+    delete:
+      consumes:
+      - application/json
+      description: Deleta uma categoria baseada no ID fornecido via query string
+      parameters:
+      - description: ID da Categoria
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: Categoria deletada com sucesso
+          schema:
+            type: string
+        "400":
+          description: ID não fornecido ou inválido
+          schema:
+            type: string
+        "500":
+          description: Erro ao deletar a categoria
+          schema:
+            type: string
+      summary: Deletar uma categoria
+      tags:
+      - categorias
+  /categorias/get:
+    get:
+      consumes:
+      - application/json
+      description: Retorna uma única categoria baseada no ID fornecido via query string
+      parameters:
+      - description: ID da Categoria
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Cat'
+        "400":
+          description: ID não fornecido ou inválido
+          schema:
+            type: string
+        "404":
+          description: Categoria não encontrada
+          schema:
+            type: string
+      summary: Buscar categoria por ID
+      tags:
+      - categorias
+  /categorias/update:
+    put:
+      consumes:
+      - application/json
+      description: Atualiza os dados de uma categoria existente baseada no ID no JSON
+      parameters:
+      - description: Dados da Categoria (deve conter ID)
+        in: body
+        name: cat
+        required: true
+        schema:
+          $ref: '#/definitions/models.Cat'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Cat'
+        "400":
+          description: Erro ao decodificar a categoria
+          schema:
+            type: string
+        "500":
+          description: Erro ao atualizar a categoria
+          schema:
+            type: string
+      summary: Atualizar uma categoria
+      tags:
+      - categorias
+  /itens:
+    get:
+      consumes:
+      - application/json
+      description: Retorna todos os itens cadastrados no banco de dados
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Iten'
+            type: array
+      summary: Listar todos os itens
+      tags:
+      - itens
+  /itens/create:
+    post:
+      consumes:
+      - application/json
+      description: Cria um item baseado no JSON fornecido
+      parameters:
+      - description: Dados do Item
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/models.Iten'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Iten'
+        "400":
+          description: Erro ao decodificar o item
+          schema:
+            type: string
+        "500":
+          description: Erro ao criar o item
+          schema:
+            type: string
+      summary: Criar um novo item
+      tags:
+      - itens
+  /itens/delete:
+    delete:
+      consumes:
+      - application/json
+      description: Deleta um item baseado no ID fornecido via query string
+      parameters:
+      - description: ID do Item
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: Item deletado com sucesso
+          schema:
+            type: string
+        "400":
+          description: ID não fornecido ou inválido
+          schema:
+            type: string
+        "500":
+          description: Erro ao deletar o item
+          schema:
+            type: string
+      summary: Deletar um item
+      tags:
+      - itens
+  /itens/get:
+    get:
+      consumes:
+      - application/json
+      description: Retorna um único item baseado no ID fornecido via query string
+      parameters:
+      - description: ID do Item
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Iten'
+        "400":
+          description: ID não fornecido ou inválido
+          schema:
+            type: string
+        "404":
+          description: Item não encontrado
+          schema:
+            type: string
+      summary: Buscar item por ID
+      tags:
+      - itens
+  /itens/get-code:
+    get:
+      consumes:
+      - application/json
+      description: Retorna um único item baseado no código fornecido via query string
+      parameters:
+      - description: Código do Item
+        in: query
+        name: codigo
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Iten'
+        "400":
+          description: Código não fornecido
+          schema:
+            type: string
+        "404":
+          description: Item não encontrado
+          schema:
+            type: string
+      summary: Buscar item por código
+      tags:
+      - itens
+  /itens/update:
+    put:
+      consumes:
+      - application/json
+      description: Atualiza os dados de um item existente baseado no ID no JSON
+      parameters:
+      - description: Dados do Item (deve conter ID)
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/models.Iten'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Iten'
+        "400":
+          description: Erro ao decodificar o item
+          schema:
+            type: string
+        "500":
+          description: Erro ao atualizar o item
+          schema:
+            type: string
+      summary: Atualizar um item
+      tags:
+      - itens
+swagger: "2.0"

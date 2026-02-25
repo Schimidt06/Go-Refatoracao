@@ -9,7 +9,26 @@ import (
 
 	"myapi/internal/config"
 	model "myapi/internal/models"
+
+	_ "myapi/docs"
+
+	httpSwagger "github.com/swaggo/http-swagger"
 )
+
+// @title Go Refatoração API
+// @version 1.0
+// @description Esta é uma API de exemplo para o curso de Refatoração em Go.
+// @termsOfService http://swagger.io/terms/
+
+// @contact.name API Support
+// @contact.url http://www.swagger.io/support
+// @contact.email support@swagger.io
+
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host localhost:8080
+// @BasePath /
 
 func main() {
 	config.ConectaComBancoDeDados()
@@ -32,8 +51,38 @@ func main() {
 	http.HandleFunc("/categorias/update", updateCategoriaHandler) // PUT para atualizar uma categoria (JSON com id)
 	http.HandleFunc("/categorias/delete", deleteCategoriaHandler) // DELETE para deletar uma categoria (espera id via query)
 
+	// Swagger documentation
+	http.Handle("/swagger/", httpSwagger.WrapHandler)
+
+	// Scalar UI
+	http.HandleFunc("/docs", scalarHandler)
+
 	log.Println("Servidor rodando na porta 8080")
+	log.Println("Documentação disponível em http://localhost:8080/docs")
 	log.Fatal(http.ListenAndServe(":8080", nil))
+}
+
+// scalarHandler serve a interface do Scalar
+func scalarHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	fmt.Fprint(w, `
+<!doctype html>
+<html>
+  <head>
+    <title>API Reference</title>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1" />
+  </head>
+  <body>
+    <script
+      id="api-reference"
+      data-url="/swagger/doc.json"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
+  </body>
+</html>
+`)
 }
 
 // Handler raiz
@@ -44,6 +93,13 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 // ==================== HANDLERS PARA ITENS ====================
 
 // Listar todos os itens
+// @Summary Listar todos os itens
+// @Description Retorna todos os itens cadastrados no banco de dados
+// @Tags itens
+// @Accept  json
+// @Produce  json
+// @Success 200 {array} model.Iten
+// @Router /itens [get]
 func listItensHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
 		http.Error(w, "Método não permitido", http.StatusMethodNotAllowed)
@@ -59,6 +115,16 @@ func listItensHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // Buscar um único item pelo id (via query string: ?id=1)
+// @Summary Buscar item por ID
+// @Description Retorna um único item baseado no ID fornecido via query string
+// @Tags itens
+// @Accept  json
+// @Produce  json
+// @Param id query int true "ID do Item"
+// @Success 200 {object} model.Iten
+// @Failure 400 {string} string "ID não fornecido ou inválido"
+// @Failure 404 {string} string "Item não encontrado"
+// @Router /itens/get [get]
 func getItenHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
 		http.Error(w, "Método não permitido", http.StatusMethodNotAllowed)
@@ -84,6 +150,16 @@ func getItenHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // Buscar um item pelo campo "codigo"
+// @Summary Buscar item por código
+// @Description Retorna um único item baseado no código fornecido via query string
+// @Tags itens
+// @Accept  json
+// @Produce  json
+// @Param codigo query string true "Código do Item"
+// @Success 200 {object} model.Iten
+// @Failure 400 {string} string "Código não fornecido"
+// @Failure 404 {string} string "Item não encontrado"
+// @Router /itens/get-code [get]
 func getItenByCodigoHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
 		http.Error(w, "Método não permitido", http.StatusMethodNotAllowed)
@@ -105,6 +181,16 @@ func getItenByCodigoHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // Criar um novo item (envie JSON via POST)
+// @Summary Criar um novo item
+// @Description Cria um item baseado no JSON fornecido
+// @Tags itens
+// @Accept  json
+// @Produce  json
+// @Param item body model.Iten true "Dados do Item"
+// @Success 200 {object} model.Iten
+// @Failure 400 {string} string "Erro ao decodificar o item"
+// @Failure 500 {string} string "Erro ao criar o item"
+// @Router /itens/create [post]
 func createItenHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "Método não permitido", http.StatusMethodNotAllowed)
@@ -124,6 +210,16 @@ func createItenHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // Atualizar um item (envie JSON via PUT, com o campo id preenchido)
+// @Summary Atualizar um item
+// @Description Atualiza os dados de um item existente baseado no ID no JSON
+// @Tags itens
+// @Accept  json
+// @Produce  json
+// @Param item body model.Iten true "Dados do Item (deve conter ID)"
+// @Success 200 {object} model.Iten
+// @Failure 400 {string} string "Erro ao decodificar o item"
+// @Failure 500 {string} string "Erro ao atualizar o item"
+// @Router /itens/update [put]
 func updateItenHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "PUT" {
 		http.Error(w, "Método não permitido", http.StatusMethodNotAllowed)
@@ -143,6 +239,16 @@ func updateItenHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // Deletar um item (via query string: ?id=1)
+// @Summary Deletar um item
+// @Description Deleta um item baseado no ID fornecido via query string
+// @Tags itens
+// @Accept  json
+// @Produce  plain
+// @Param id query int true "ID do Item"
+// @Success 200 {string} string "Item deletado com sucesso"
+// @Failure 400 {string} string "ID não fornecido ou inválido"
+// @Failure 500 {string} string "Erro ao deletar o item"
+// @Router /itens/delete [delete]
 func deleteItenHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "DELETE" {
 		http.Error(w, "Método não permitido", http.StatusMethodNotAllowed)
@@ -168,6 +274,13 @@ func deleteItenHandler(w http.ResponseWriter, r *http.Request) {
 // ==================== HANDLERS PARA CATEGORIAS ====================
 
 // Listar todas as categorias
+// @Summary Listar todas as categorias
+// @Description Retorna todas as categorias cadastradas no banco de dados
+// @Tags categorias
+// @Accept  json
+// @Produce  json
+// @Success 200 {array} model.Cat
+// @Router /categorias [get]
 func listCategoriasHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
 		http.Error(w, "Método não permitido", http.StatusMethodNotAllowed)
@@ -183,6 +296,16 @@ func listCategoriasHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // Buscar uma única categoria pelo id (via query string: ?id=1)
+// @Summary Buscar categoria por ID
+// @Description Retorna uma única categoria baseada no ID fornecido via query string
+// @Tags categorias
+// @Accept  json
+// @Produce  json
+// @Param id query int true "ID da Categoria"
+// @Success 200 {object} model.Cat
+// @Failure 400 {string} string "ID não fornecido ou inválido"
+// @Failure 404 {string} string "Categoria não encontrada"
+// @Router /categorias/get [get]
 func getCategoriaHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
 		http.Error(w, "Método não permitido", http.StatusMethodNotAllowed)
@@ -208,6 +331,16 @@ func getCategoriaHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // Criar uma nova categoria (envie JSON via POST)
+// @Summary Criar uma nova categoria
+// @Description Cria uma categoria baseada no JSON fornecido
+// @Tags categorias
+// @Accept  json
+// @Produce  json
+// @Param cat body model.Cat true "Dados da Categoria"
+// @Success 200 {object} model.Cat
+// @Failure 400 {string} string "Erro ao decodificar a categoria"
+// @Failure 500 {string} string "Erro ao criar a categoria"
+// @Router /categorias/create [post]
 func createCategoriaHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "Método não permitido", http.StatusMethodNotAllowed)
@@ -227,6 +360,16 @@ func createCategoriaHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // Atualizar uma categoria (envie JSON via PUT, com o campo id preenchido)
+// @Summary Atualizar uma categoria
+// @Description Atualiza os dados de uma categoria existente baseada no ID no JSON
+// @Tags categorias
+// @Accept  json
+// @Produce  json
+// @Param cat body model.Cat true "Dados da Categoria (deve conter ID)"
+// @Success 200 {object} model.Cat
+// @Failure 400 {string} string "Erro ao decodificar a categoria"
+// @Failure 500 {string} string "Erro ao atualizar a categoria"
+// @Router /categorias/update [put]
 func updateCategoriaHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "PUT" {
 		http.Error(w, "Método não permitido", http.StatusMethodNotAllowed)
@@ -246,6 +389,16 @@ func updateCategoriaHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // Deletar uma categoria (via query string: ?id=1)
+// @Summary Deletar uma categoria
+// @Description Deleta uma categoria baseada no ID fornecido via query string
+// @Tags categorias
+// @Accept  json
+// @Produce  plain
+// @Param id query int true "ID da Categoria"
+// @Success 200 {string} string "Categoria deletada com sucesso"
+// @Failure 400 {string} string "ID não fornecido ou inválido"
+// @Failure 500 {string} string "Erro ao deletar a categoria"
+// @Router /categorias/delete [delete]
 func deleteCategoriaHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "DELETE" {
 		http.Error(w, "Método não permitido", http.StatusMethodNotAllowed)
