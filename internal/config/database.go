@@ -22,5 +22,5 @@ func ConectaComBancoDeDados() {
 
 	// AutoMigrate para criar/ajustar tabelas
 	DB.AutoMigrate(&models.Iten{})
-	DB.AutoMigrate(&models.Cat{})
+	DB.AutoMigrate(&models.Categoria{})
 }
