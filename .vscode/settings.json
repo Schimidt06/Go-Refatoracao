@@ -28,5 +28,27 @@
     "gitlens.views.commits.files.layout": "list",
     "gitlens.views.commits.showBranchComparison": "working",
     "gitlens.views.branches.showBranchComparison": "branch",
-    "gitlens.decorations.enabled": true
+    "gitlens.decorations.enabled": true,
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": "always"
+    },
+    "go.useLanguageServer": true,
+    "go.lintTool": "golangci-lint",
+    "go.formatTool": "gofmt",
+    "[go]": {
+        "editor.defaultFormatter": "golang.go",
+        "editor.formatOnSave": true
+    },
+    "sqltools.connections": [
+        {
+            "name": "Postgres-Local",
+            "driver": "PostgreSQL",
+            "server": "localhost",
+            "port": 5432,
+            "database": "postgres",
+            "username": "postgres",
+            "password": "postgres"
+        }
+    ]
 }

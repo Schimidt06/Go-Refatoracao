@@ -1,32 +1,212 @@
 {
     "client": "Thunder Client",
     "collectionName": "Go Refatoracao",
-    "dateExported": "2026-02-19T10:45:00.000Z",
+    "dateExported": "2026-02-26T16:20:00.000Z",
     "version": "1.1",
-    "folders": [],
+    "folders": [
+        {
+            "_id": "fold-1",
+            "name": "Itens",
+            "containerId": "",
+            "sortNum": 10000
+        },
+        {
+            "_id": "fold-2",
+            "name": "Categorias",
+            "containerId": "",
+            "sortNum": 20000
+        }
+    ],
     "requests": [
         {
-            "_id": "req-1",
+            "_id": "req-itens-list",
             "colId": "col-1",
-            "containerId": "",
-            "name": "Criar Item - Leitor de Cartões alienígenas",
+            "containerId": "fold-1",
+            "name": "Listar Itens",
+            "url": "http://localhost:8080/itens",
+            "method": "GET",
+            "sortNum": 10000,
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "req-itens-get",
+            "colId": "col-1",
+            "containerId": "fold-1",
+            "name": "Buscar Item por ID",
+            "url": "http://localhost:8080/itens/get?id=1",
+            "method": "GET",
+            "sortNum": 20000,
+            "params": [
+                {
+                    "name": "id",
+                    "value": "1",
+                    "isPath": false
+                }
+            ],
+            "tests": []
+        },
+        {
+            "_id": "req-itens-get-code",
+            "colId": "col-1",
+            "containerId": "fold-1",
+            "name": "Buscar Item por Código",
+            "url": "http://localhost:8080/itens/get-code?codigo=TEC001",
+            "method": "GET",
+            "sortNum": 30000,
+            "params": [
+                {
+                    "name": "codigo",
+                    "value": "TEC001",
+                    "isPath": false
+                }
+            ],
+            "tests": []
+        },
+        {
+            "_id": "req-itens-create",
+            "colId": "col-1",
+            "containerId": "fold-1",
+            "name": "Criar Item",
             "url": "http://localhost:8080/itens/create",
             "method": "POST",
-            "sortNum": 10000,
-            "created": "2026-02-19T10:45:00.000Z",
-            "modified": "2026-02-19T10:45:00.000Z",
+            "sortNum": 40000,
             "headers": [
                 {
                     "name": "Content-Type",
                     "value": "application/json"
                 }
             ],
-            "params": [],
             "body": {
                 "type": "json",
-                "raw": "{\n    \"nome\": \"Leitor de Cartões alienígenas\",\n    \"codigo\": \"ETI047\",\n    \"descricao\": \"Leitor de cartões multi-formato interplanetário\",\n    \"preco\": 200,\n    \"quantidade\": 30\n}",
+                "raw": "{\n    \"nome\": \"Mouse Gamer Wireless\",\n    \"codigo\": \"MOU999\",\n    \"descricao\": \"Mouse gamer de alta performance\",\n    \"preco\": 350.50,\n    \"quantidade\": 15\n}",
                 "form": []
             },
+            "tests": []
+        },
+        {
+            "_id": "req-itens-update",
+            "colId": "col-1",
+            "containerId": "fold-1",
+            "name": "Atualizar Item",
+            "url": "http://localhost:8080/itens/update",
+            "method": "PUT",
+            "sortNum": 50000,
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                }
+            ],
+            "body": {
+                "type": "json",
+                "raw": "{\n    \"id\": 1,\n    \"nome\": \"Teclado Mecânico RGB\",\n    \"codigo\": \"TEC001\",\n    \"descricao\": \"Teclado mecânico atualizado\",\n    \"preco\": 180.00,\n    \"quantidade\": 25\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "req-itens-delete",
+            "colId": "col-1",
+            "containerId": "fold-1",
+            "name": "Deletar Item",
+            "url": "http://localhost:8080/itens/delete?id=1",
+            "method": "DELETE",
+            "sortNum": 60000,
+            "params": [
+                {
+                    "name": "id",
+                    "value": "1",
+                    "isPath": false
+                }
+            ],
+            "tests": []
+        },
+        {
+            "_id": "req-cats-list",
+            "colId": "col-1",
+            "containerId": "fold-2",
+            "name": "Listar Categorias",
+            "url": "http://localhost:8080/categorias",
+            "method": "GET",
+            "sortNum": 70000,
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "req-cats-get",
+            "colId": "col-1",
+            "containerId": "fold-2",
+            "name": "Buscar Categoria por ID",
+            "url": "http://localhost:8080/categorias/get?id=1",
+            "method": "GET",
+            "sortNum": 80000,
+            "params": [
+                {
+                    "name": "id",
+                    "value": "1",
+                    "isPath": false
+                }
+            ],
+            "tests": []
+        },
+        {
+            "_id": "req-cats-create",
+            "colId": "col-1",
+            "containerId": "fold-2",
+            "name": "Criar Categoria",
+            "url": "http://localhost:8080/categorias/create",
+            "method": "POST",
+            "sortNum": 90000,
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                }
+            ],
+            "body": {
+                "type": "json",
+                "raw": "{\n    \"nome\": \"Games\",\n    \"codigo\": \"GAME\",\n    \"descricao\": \"Consoles e jogos variados\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "req-cats-update",
+            "colId": "col-1",
+            "containerId": "fold-2",
+            "name": "Atualizar Categoria",
+            "url": "http://localhost:8080/categorias/update",
+            "method": "PUT",
+            "sortNum": 100000,
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                }
+            ],
+            "body": {
+                "type": "json",
+                "raw": "{\n    \"id\": 1,\n    \"nome\": \"Eletrônicos Premium\",\n    \"codigo\": \"ELEC\",\n    \"descricao\": \"Produtos eletrônicos de alto padrão\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "req-cats-delete",
+            "colId": "col-1",
+            "containerId": "fold-2",
+            "name": "Deletar Categoria",
+            "url": "http://localhost:8080/categorias/delete?id=1",
+            "method": "DELETE",
+            "sortNum": 110000,
+            "params": [
+                {
+                    "name": "id",
+                    "value": "1",
+                    "isPath": false
+                }
+            ],
             "tests": []
         }
     ]

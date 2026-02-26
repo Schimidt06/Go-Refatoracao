@@ -1,0 +1,10 @@
+{
+    "recommendations": [
+        "golang.Go",
+        "rangav.vscode-thunder-client",
+        "ms-azuretools.vscode-docker",
+        "mtxr.sqltools",
+        "mtxr.sqltools-driver-pg",
+        "usernamehw.errorlens"
+    ]
+}
