@@ -17,7 +17,7 @@ import (
 // @Tags itens
 // @Accept  json
 // @Produce  json
-// @Success 200 {array} model.Iten
+// @Success 200 {array} models.Iten
 // @Router /itens [get]
 func ListItensHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
@@ -30,7 +30,9 @@ func ListItensHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Erro ao buscar itens", http.StatusInternalServerError)
 		return
 	}
-	json.NewEncoder(w).Encode(itens)
+	if err := json.NewEncoder(w).Encode(itens); err != nil {
+		http.Error(w, "Erro ao codificar os itens", http.StatusInternalServerError)
+	}
 }
 
 // Buscar um único item pelo id (via query string: ?id=1)
@@ -40,7 +42,7 @@ func ListItensHandler(w http.ResponseWriter, r *http.Request) {
 // @Accept  json
 // @Produce  json
 // @Param id query int true "ID do Item"
-// @Success 200 {object} model.Iten
+// @Success 200 {object} models.Iten
 // @Failure 400 {string} string "ID não fornecido ou inválido"
 // @Failure 404 {string} string "Item não encontrado"
 // @Router /itens/get [get]
@@ -65,7 +67,9 @@ func GetItenHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Item não encontrado", http.StatusNotFound)
 		return
 	}
-	json.NewEncoder(w).Encode(item)
+	if err := json.NewEncoder(w).Encode(item); err != nil {
+		http.Error(w, "Erro ao codificar o item", http.StatusInternalServerError)
+	}
 }
 
 // Buscar um item pelo campo "codigo"
@@ -75,7 +79,7 @@ func GetItenHandler(w http.ResponseWriter, r *http.Request) {
 // @Accept  json
 // @Produce  json
 // @Param codigo query string true "Código do Item"
-// @Success 200 {object} model.Iten
+// @Success 200 {object} models.Iten
 // @Failure 400 {string} string "Código não fornecido"
 // @Failure 404 {string} string "Item não encontrado"
 // @Router /itens/get-code [get]
@@ -96,7 +100,9 @@ func GetItenByCodigoHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Item não encontrado", http.StatusNotFound)
 		return
 	}
-	json.NewEncoder(w).Encode(item)
+	if err := json.NewEncoder(w).Encode(item); err != nil {
+		http.Error(w, "Erro ao codificar o item", http.StatusInternalServerError)
+	}
 }
 
 // Criar um novo item (envie JSON via POST)
@@ -105,8 +111,8 @@ func GetItenByCodigoHandler(w http.ResponseWriter, r *http.Request) {
 // @Tags itens
 // @Accept  json
 // @Produce  json
-// @Param item body model.Iten true "Dados do Item"
-// @Success 200 {object} model.Iten
+// @Param item body models.Iten true "Dados do Item"
+// @Success 200 {object} models.Iten
 // @Failure 400 {string} string "Erro ao decodificar o item"
 // @Failure 500 {string} string "Erro ao criar o item"
 // @Router /itens/create [post]
@@ -127,7 +133,9 @@ func CreateItenHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	json.NewEncoder(w).Encode(createdItem)
+	if err := json.NewEncoder(w).Encode(createdItem); err != nil {
+		http.Error(w, "Erro ao codificar o item criado", http.StatusInternalServerError)
+	}
 }
 
 // Atualizar um item (envie JSON via PUT, com o campo id preenchido)
@@ -136,8 +144,8 @@ func CreateItenHandler(w http.ResponseWriter, r *http.Request) {
 // @Tags itens
 // @Accept  json
 // @Produce  json
-// @Param item body model.Iten true "Dados do Item (deve conter ID)"
-// @Success 200 {object} model.Iten
+// @Param item body models.Iten true "Dados do Item (deve conter ID)"
+// @Success 200 {object} models.Iten
 // @Failure 400 {string} string "Erro ao decodificar o item"
 // @Failure 500 {string} string "Erro ao atualizar o item"
 // @Router /itens/update [put]
@@ -156,7 +164,9 @@ func UpdateItenHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Erro ao atualizar o item", http.StatusInternalServerError)
 		return
 	}
-	json.NewEncoder(w).Encode(item)
+	if err := json.NewEncoder(w).Encode(item); err != nil {
+		http.Error(w, "Erro ao codificar o item", http.StatusInternalServerError)
+	}
 }
 
 // Deletar um item (via query string: ?id=1)
@@ -189,5 +199,7 @@ func DeleteItenHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Erro ao deletar o item", http.StatusInternalServerError)
 		return
 	}
-	w.Write([]byte("Item deletado com sucesso"))
+	if _, err := w.Write([]byte("Item deletado com sucesso")); err != nil {
+		http.Error(w, "Erro ao escrever resposta", http.StatusInternalServerError)
+	}
 }

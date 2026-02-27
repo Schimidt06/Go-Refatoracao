@@ -9,7 +9,7 @@ import (
 
 	"myapi/internal/config"
 	"myapi/internal/handlers"
-	model "myapi/internal/models"
+	"myapi/internal/models"
 
 	_ "myapi/docs"
 
@@ -99,7 +99,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 // @Tags categorias
 // @Accept  json
 // @Produce  json
-// @Success 200 {array} model.Categoria
+// @Success 200 {array} models.Categoria
 // @Router /categorias [get]
 func listCategoriasHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
@@ -107,7 +107,7 @@ func listCategoriasHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
-	var categorias []model.Categoria
+	var categorias []models.Categoria
 	if err := config.DB.Find(&categorias).Error; err != nil {
 		http.Error(w, "Erro ao buscar categorias", http.StatusInternalServerError)
 		return
@@ -122,7 +122,7 @@ func listCategoriasHandler(w http.ResponseWriter, r *http.Request) {
 // @Accept  json
 // @Produce  json
 // @Param id query int true "ID da Categoria"
-// @Success 200 {object} model.Categoria
+// @Success 200 {object} models.Categoria
 // @Failure 400 {string} string "ID não fornecido ou inválido"
 // @Failure 404 {string} string "Categoria não encontrada"
 // @Router /categorias/get [get]
@@ -142,7 +142,7 @@ func getCategoriaHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "ID inválido", http.StatusBadRequest)
 		return
 	}
-	var categorias model.Categoria
+	var categorias models.Categoria
 	if err := config.DB.First(&categorias, id).Error; err != nil {
 		http.Error(w, "Categoria não encontrada", http.StatusNotFound)
 		return
@@ -156,8 +156,8 @@ func getCategoriaHandler(w http.ResponseWriter, r *http.Request) {
 // @Tags categorias
 // @Accept  json
 // @Produce  json
-// @Param cat body model.Categoria true "Dados da Categoria"
-// @Success 200 {object} model.Categoria
+// @Param cat body models.Categoria true "Dados da Categoria"
+// @Success 200 {object} models.Categoria
 // @Failure 400 {string} string "Erro ao decodificar a categoria"
 // @Failure 500 {string} string "Erro ao criar a categoria"
 // @Router /categorias/create [post]
@@ -167,7 +167,7 @@ func createCategoriaHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
-	var categorias model.Categoria
+	var categorias models.Categoria
 	if err := json.NewDecoder(r.Body).Decode(&categorias); err != nil {
 		http.Error(w, "Erro ao decodificar a categoria", http.StatusBadRequest)
 		return
@@ -185,8 +185,8 @@ func createCategoriaHandler(w http.ResponseWriter, r *http.Request) {
 // @Tags categorias
 // @Accept  json
 // @Produce  json
-// @Param cat body model.Categoria true "Dados da Categoria (deve conter ID)"
-// @Success 200 {object} model.Categoria
+// @Param cat body models.Categoria true "Dados da Categoria (deve conter ID)"
+// @Success 200 {object} models.Categoria
 // @Failure 400 {string} string "Erro ao decodificar a categoria"
 // @Failure 500 {string} string "Erro ao atualizar a categoria"
 // @Router /categorias/update [put]
@@ -196,7 +196,7 @@ func updateCategoriaHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
-	var categorias model.Categoria
+	var categorias models.Categoria
 	if err := json.NewDecoder(r.Body).Decode(&categorias); err != nil {
 		http.Error(w, "Erro ao decodificar a categoria", http.StatusBadRequest)
 		return
@@ -234,7 +234,7 @@ func deleteCategoriaHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "ID inválido", http.StatusBadRequest)
 		return
 	}
-	if err := config.DB.Delete(&model.Categoria{}, id).Error; err != nil {
+	if err := config.DB.Delete(&models.Categoria{}, id).Error; err != nil {
 		http.Error(w, "Erro ao deletar a categoria", http.StatusInternalServerError)
 		return
 	}
