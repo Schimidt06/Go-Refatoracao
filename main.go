@@ -17,56 +17,31 @@ import (
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
-// @title Go Refatoração API
-// @version 1.0
-// @description Esta é uma API de exemplo para o curso de Refatoração em Go.
-// @termsOfService http://swagger.io/terms/
-
-// @contact.name API Support
-// @contact.url http://www.swagger.io/support
-// @contact.email support@swagger.io
-
-// @license.name Apache 2.0
-// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @host localhost:8080
-// @BasePath /
-
 func main() {
 	config.ConectaComBancoDeDados()
 
 	r := mux.NewRouter()
 
-	// Endpoint raiz
-	r.HandleFunc("/api", indexHandler).Methods("GET")
+	r.HandleFunc("/api/itens", handlers.ListItensHandler).Methods("GET")
+	r.HandleFunc("/api/itens/get", handlers.GetItenHandler).Methods("GET")
+	r.HandleFunc("/api/itens/get-code", handlers.GetItenByCodigoHandler).Methods("GET")
+	r.HandleFunc("/api/itens/create", handlers.CreateItenHandler).Methods("POST")
+	r.HandleFunc("/api/itens/update", handlers.UpdateItenHandler).Methods("PUT")
+	r.HandleFunc("/api/itens/delete", handlers.DeleteItenHandler).Methods("DELETE")
 
-	// Endpoints para Itens
-	r.HandleFunc("/itens", handlers.ListItensHandler).Methods("GET")                // GET para listar todos os itens
-	r.HandleFunc("/itens/get", handlers.GetItenHandler).Methods("GET")              // GET para buscar um item (espera id via query: ?id=1)
-	r.HandleFunc("/itens/get-code", handlers.GetItenByCodigoHandler).Methods("GET") // get-code?codigo=TEC001
-	r.HandleFunc("/itens/create", handlers.CreateItenHandler).Methods("POST")       // POST para criar um item
-	r.HandleFunc("/itens/update", handlers.UpdateItenHandler).Methods("PUT")        // PUT para atualizar um item (JSON com id)
-	r.HandleFunc("/itens/delete", handlers.DeleteItenHandler).Methods("DELETE")     // DELETE para deletar um item (espera id via query: ?id=1)
+	r.HandleFunc("/categorias", listCategoriasHandler).Methods("GET")
+	r.HandleFunc("/categorias/get", getCategoriaHandler).Methods("GET")
+	r.HandleFunc("/categorias/create", createCategoriaHandler).Methods("POST")
+	r.HandleFunc("/categorias/update", updateCategoriaHandler).Methods("PUT")
+	r.HandleFunc("/categorias/delete", deleteCategoriaHandler).Methods("DELETE")
 
-	// Endpoints para Categorias
-	r.HandleFunc("/categorias", listCategoriasHandler).Methods("GET")            // GET para listar todas as categorias
-	r.HandleFunc("/categorias/get", getCategoriaHandler).Methods("GET")          // GET para buscar uma categoria (espera id via query)
-	r.HandleFunc("/categorias/create", createCategoriaHandler).Methods("POST")   // POST para criar uma categoria
-	r.HandleFunc("/categorias/update", updateCategoriaHandler).Methods("PUT")    // PUT para atualizar uma categoria (JSON com id)
-	r.HandleFunc("/categorias/delete", deleteCategoriaHandler).Methods("DELETE") // DELETE para deletar uma categoria (espera id via query)
-
-	// Swagger documentation
 	r.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
-
-	// Scalar UI
 	r.HandleFunc("/docs", scalarHandler).Methods("GET")
 
 	log.Println("Servidor rodando na porta 8080")
-	log.Println("Documentação disponível em http://localhost:8080/docs")
-	log.Fatal(http.ListenAndServe(":8080", r))
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
-// scalarHandler serve a interface do Scalar
 func scalarHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	fmt.Fprint(w, `
@@ -89,21 +64,6 @@ func scalarHandler(w http.ResponseWriter, r *http.Request) {
 `)
 }
 
-// Handler raiz
-func indexHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "API Go!")
-}
-
-// ==================== HANDLERS PARA CATEGORIAS ====================
-
-// Listar todas as categorias
-// @Summary Listar todas as categorias
-// @Description Retorna todas as categorias cadastradas no banco de dados
-// @Tags categorias
-// @Accept  json
-// @Produce  json
-// @Success 200 {array} models.Categoria
-// @Router /categorias [get]
 func listCategoriasHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var categorias []models.Categoria
@@ -116,17 +76,6 @@ func listCategoriasHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Buscar uma única categoria pelo id (via query string: ?id=1)
-// @Summary Buscar categoria por ID
-// @Description Retorna uma única categoria baseada no ID fornecido via query string
-// @Tags categorias
-// @Accept  json
-// @Produce  json
-// @Param id query int true "ID da Categoria"
-// @Success 200 {object} models.Categoria
-// @Failure 400 {string} string "ID não fornecido ou inválido"
-// @Failure 404 {string} string "Categoria não encontrada"
-// @Router /categorias/get [get]
 func getCategoriaHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	idStr := r.URL.Query().Get("id")
@@ -149,17 +98,6 @@ func getCategoriaHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Criar uma nova categoria (envie JSON via POST)
-// @Summary Criar uma nova categoria
-// @Description Cria uma categoria baseada no JSON fornecido
-// @Tags categorias
-// @Accept  json
-// @Produce  json
-// @Param cat body models.Categoria true "Dados da Categoria"
-// @Success 200 {object} models.Categoria
-// @Failure 400 {string} string "Erro ao decodificar a categoria"
-// @Failure 500 {string} string "Erro ao criar a categoria"
-// @Router /categorias/create [post]
 func createCategoriaHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var categorias models.Categoria
@@ -176,17 +114,6 @@ func createCategoriaHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Atualizar uma categoria (envie JSON via PUT, com o campo id preenchido)
-// @Summary Atualizar uma categoria
-// @Description Atualiza os dados de uma categoria existente baseada no ID no JSON
-// @Tags categorias
-// @Accept  json
-// @Produce  json
-// @Param cat body models.Categoria true "Dados da Categoria (deve conter ID)"
-// @Success 200 {object} models.Categoria
-// @Failure 400 {string} string "Erro ao decodificar a categoria"
-// @Failure 500 {string} string "Erro ao atualizar a categoria"
-// @Router /categorias/update [put]
 func updateCategoriaHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var categorias models.Categoria
@@ -203,17 +130,6 @@ func updateCategoriaHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Deletar uma categoria (via query string: ?id=1)
-// @Summary Deletar uma categoria
-// @Description Deleta uma categoria baseada no ID fornecido via query string
-// @Tags categorias
-// @Accept  json
-// @Produce  plain
-// @Param id query int true "ID da Categoria"
-// @Success 200 {string} string "Categoria deletada com sucesso"
-// @Failure 400 {string} string "ID não fornecido ou inválido"
-// @Failure 500 {string} string "Erro ao deletar a categoria"
-// @Router /categorias/delete [delete]
 func deleteCategoriaHandler(w http.ResponseWriter, r *http.Request) {
 	idStr := r.URL.Query().Get("id")
 	if idStr == "" {

@@ -20,7 +20,6 @@ func ConectaComBancoDeDados() {
 	}
 	DB = db
 
-	// AutoMigrate para criar/ajustar tabelas
 	if err := DB.AutoMigrate(&models.Iten{}); err != nil {
 		log.Fatalf("Erro ao migrar tabela Iten: %v", err)
 	}

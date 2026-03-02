@@ -1,6 +1,5 @@
 package models
 
-// Modelo para a tabela "itens"
 type Iten struct {
 	Id         uint    `gorm:"primaryKey" json:"id"`
 	Nome       string  `json:"nome"`
