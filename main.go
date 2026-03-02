@@ -18,17 +18,18 @@ import (
 )
 
 func main() {
-	config.ConectaComBancoDeDados()
+	config.ConnectDatabase()
 
 	r := mux.NewRouter()
 
 	r.HandleFunc("/api/itens", handlers.ListItensHandler).Methods("GET")
-	r.HandleFunc("/api/itens/get", handlers.GetItenHandler).Methods("GET")
-	r.HandleFunc("/api/itens/get-code", handlers.GetItenByCodigoHandler).Methods("GET")
-	r.HandleFunc("/api/itens/create", handlers.CreateItenHandler).Methods("POST")
-	r.HandleFunc("/api/itens/update", handlers.UpdateItenHandler).Methods("PUT")
-	r.HandleFunc("/api/itens/delete", handlers.DeleteItenHandler).Methods("DELETE")
+r.HandleFunc("/api/itens/{id}", handlers.GetItenHandler).Methods("GET")
+r.HandleFunc("/api/itens/codigo/{codigo}", handlers.GetItenByCodigoHandler).Methods("GET")
+r.HandleFunc("/api/itens", handlers.CreateItenHandler).Methods("POST")
+r.HandleFunc("/api/itens", handlers.UpdateItenHandler).Methods("PUT")
+r.HandleFunc("/api/itens", handlers.DeleteItenHandler).Methods("DELETE")
 
+	// Endpoints para Categorias
 	r.HandleFunc("/categorias", listCategoriasHandler).Methods("GET")
 	r.HandleFunc("/categorias/get", getCategoriaHandler).Methods("GET")
 	r.HandleFunc("/categorias/create", createCategoriaHandler).Methods("POST")
@@ -39,7 +40,7 @@ func main() {
 	r.HandleFunc("/docs", scalarHandler).Methods("GET")
 
 	log.Println("Servidor rodando na porta 8080")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Fatal(http.ListenAndServe(":8080", r))
 }
 
 func scalarHandler(w http.ResponseWriter, r *http.Request) {
