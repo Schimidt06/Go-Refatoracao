@@ -13,6 +13,7 @@ import (
 
 	_ "myapi/docs"
 
+	"github.com/gorilla/mux"
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
@@ -34,33 +35,35 @@ import (
 func main() {
 	config.ConectaComBancoDeDados()
 
+	r := mux.NewRouter()
+
 	// Endpoint raiz
-	http.HandleFunc("/api", indexHandler)
+	r.HandleFunc("/api", indexHandler).Methods("GET")
 
 	// Endpoints para Itens
-	http.HandleFunc("/itens", handlers.ListItensHandler)                // GET para listar todos os itens
-	http.HandleFunc("/itens/get", handlers.GetItenHandler)              // GET para buscar um item (espera id via query: ?id=1)
-	http.HandleFunc("/itens/get-code", handlers.GetItenByCodigoHandler) // get-code?codigo=TEC001
-	http.HandleFunc("/itens/create", handlers.CreateItenHandler)        // POST para criar um item
-	http.HandleFunc("/itens/update", handlers.UpdateItenHandler)        // PUT para atualizar um item (JSON com id)
-	http.HandleFunc("/itens/delete", handlers.DeleteItenHandler)        // DELETE para deletar um item (espera id via query: ?id=1)
+	r.HandleFunc("/itens", handlers.ListItensHandler).Methods("GET")                // GET para listar todos os itens
+	r.HandleFunc("/itens/get", handlers.GetItenHandler).Methods("GET")              // GET para buscar um item (espera id via query: ?id=1)
+	r.HandleFunc("/itens/get-code", handlers.GetItenByCodigoHandler).Methods("GET") // get-code?codigo=TEC001
+	r.HandleFunc("/itens/create", handlers.CreateItenHandler).Methods("POST")       // POST para criar um item
+	r.HandleFunc("/itens/update", handlers.UpdateItenHandler).Methods("PUT")        // PUT para atualizar um item (JSON com id)
+	r.HandleFunc("/itens/delete", handlers.DeleteItenHandler).Methods("DELETE")     // DELETE para deletar um item (espera id via query: ?id=1)
 
 	// Endpoints para Categorias
-	http.HandleFunc("/categorias", listCategoriasHandler)         // GET para listar todas as categorias
-	http.HandleFunc("/categorias/get", getCategoriaHandler)       // GET para buscar uma categoria (espera id via query)
-	http.HandleFunc("/categorias/create", createCategoriaHandler) // POST para criar uma categoria
-	http.HandleFunc("/categorias/update", updateCategoriaHandler) // PUT para atualizar uma categoria (JSON com id)
-	http.HandleFunc("/categorias/delete", deleteCategoriaHandler) // DELETE para deletar uma categoria (espera id via query)
+	r.HandleFunc("/categorias", listCategoriasHandler).Methods("GET")            // GET para listar todas as categorias
+	r.HandleFunc("/categorias/get", getCategoriaHandler).Methods("GET")          // GET para buscar uma categoria (espera id via query)
+	r.HandleFunc("/categorias/create", createCategoriaHandler).Methods("POST")   // POST para criar uma categoria
+	r.HandleFunc("/categorias/update", updateCategoriaHandler).Methods("PUT")    // PUT para atualizar uma categoria (JSON com id)
+	r.HandleFunc("/categorias/delete", deleteCategoriaHandler).Methods("DELETE") // DELETE para deletar uma categoria (espera id via query)
 
 	// Swagger documentation
-	http.Handle("/swagger/", httpSwagger.WrapHandler)
+	r.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
 
 	// Scalar UI
-	http.HandleFunc("/docs", scalarHandler)
+	r.HandleFunc("/docs", scalarHandler).Methods("GET")
 
 	log.Println("Servidor rodando na porta 8080")
 	log.Println("Documentação disponível em http://localhost:8080/docs")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Fatal(http.ListenAndServe(":8080", r))
 }
 
 // scalarHandler serve a interface do Scalar
@@ -102,17 +105,15 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {array} models.Categoria
 // @Router /categorias [get]
 func listCategoriasHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "GET" {
-		http.Error(w, "Método não permitido", http.StatusMethodNotAllowed)
-		return
-	}
 	w.Header().Set("Content-Type", "application/json")
 	var categorias []models.Categoria
 	if err := config.DB.Find(&categorias).Error; err != nil {
 		http.Error(w, "Erro ao buscar categorias", http.StatusInternalServerError)
 		return
 	}
-	json.NewEncoder(w).Encode(categorias)
+	if err := json.NewEncoder(w).Encode(categorias); err != nil {
+		http.Error(w, "Erro ao codificar categorias", http.StatusInternalServerError)
+	}
 }
 
 // Buscar uma única categoria pelo id (via query string: ?id=1)
@@ -127,10 +128,6 @@ func listCategoriasHandler(w http.ResponseWriter, r *http.Request) {
 // @Failure 404 {string} string "Categoria não encontrada"
 // @Router /categorias/get [get]
 func getCategoriaHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "GET" {
-		http.Error(w, "Método não permitido", http.StatusMethodNotAllowed)
-		return
-	}
 	w.Header().Set("Content-Type", "application/json")
 	idStr := r.URL.Query().Get("id")
 	if idStr == "" {
@@ -147,7 +144,9 @@ func getCategoriaHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Categoria não encontrada", http.StatusNotFound)
 		return
 	}
-	json.NewEncoder(w).Encode(categorias)
+	if err := json.NewEncoder(w).Encode(categorias); err != nil {
+		http.Error(w, "Erro ao codificar categoria", http.StatusInternalServerError)
+	}
 }
 
 // Criar uma nova categoria (envie JSON via POST)
@@ -162,10 +161,6 @@ func getCategoriaHandler(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {string} string "Erro ao criar a categoria"
 // @Router /categorias/create [post]
 func createCategoriaHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
-		http.Error(w, "Método não permitido", http.StatusMethodNotAllowed)
-		return
-	}
 	w.Header().Set("Content-Type", "application/json")
 	var categorias models.Categoria
 	if err := json.NewDecoder(r.Body).Decode(&categorias); err != nil {
@@ -176,7 +171,9 @@ func createCategoriaHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Erro ao criar a categoria", http.StatusInternalServerError)
 		return
 	}
-	json.NewEncoder(w).Encode(categorias)
+	if err := json.NewEncoder(w).Encode(categorias); err != nil {
+		http.Error(w, "Erro ao codificar categoria criada", http.StatusInternalServerError)
+	}
 }
 
 // Atualizar uma categoria (envie JSON via PUT, com o campo id preenchido)
@@ -191,10 +188,6 @@ func createCategoriaHandler(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {string} string "Erro ao atualizar a categoria"
 // @Router /categorias/update [put]
 func updateCategoriaHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "PUT" {
-		http.Error(w, "Método não permitido", http.StatusMethodNotAllowed)
-		return
-	}
 	w.Header().Set("Content-Type", "application/json")
 	var categorias models.Categoria
 	if err := json.NewDecoder(r.Body).Decode(&categorias); err != nil {
@@ -205,7 +198,9 @@ func updateCategoriaHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Erro ao atualizar a categoria", http.StatusInternalServerError)
 		return
 	}
-	json.NewEncoder(w).Encode(categorias)
+	if err := json.NewEncoder(w).Encode(categorias); err != nil {
+		http.Error(w, "Erro ao codificar categoria atualizada", http.StatusInternalServerError)
+	}
 }
 
 // Deletar uma categoria (via query string: ?id=1)
@@ -220,10 +215,6 @@ func updateCategoriaHandler(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {string} string "Erro ao deletar a categoria"
 // @Router /categorias/delete [delete]
 func deleteCategoriaHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "DELETE" {
-		http.Error(w, "Método não permitido", http.StatusMethodNotAllowed)
-		return
-	}
 	idStr := r.URL.Query().Get("id")
 	if idStr == "" {
 		http.Error(w, "ID não fornecido", http.StatusBadRequest)
@@ -238,5 +229,7 @@ func deleteCategoriaHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Erro ao deletar a categoria", http.StatusInternalServerError)
 		return
 	}
-	w.Write([]byte("Categoria deletada com sucesso"))
+	if _, err := w.Write([]byte("Categoria deletada com sucesso")); err != nil {
+		http.Error(w, "Erro ao escrever resposta", http.StatusInternalServerError)
+	}
 }

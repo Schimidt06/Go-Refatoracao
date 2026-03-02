@@ -43,7 +43,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.Cat"
+                                "$ref": "#/definitions/models.Categoria"
                             }
                         }
                     }
@@ -70,7 +70,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Cat"
+                            "$ref": "#/definitions/models.Categoria"
                         }
                     }
                 ],
@@ -78,7 +78,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.Cat"
+                            "$ref": "#/definitions/models.Categoria"
                         }
                     },
                     "400": {
@@ -166,7 +166,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.Cat"
+                            "$ref": "#/definitions/models.Categoria"
                         }
                     },
                     "400": {
@@ -204,7 +204,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Cat"
+                            "$ref": "#/definitions/models.Categoria"
                         }
                     }
                 ],
@@ -212,7 +212,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.Cat"
+                            "$ref": "#/definitions/models.Categoria"
                         }
                     },
                     "400": {
@@ -482,7 +482,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "models.Cat": {
+        "models.Categoria": {
             "type": "object",
             "properties": {
                 "codigo": {

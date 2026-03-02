@@ -1,6 +1,6 @@
 basePath: /
 definitions:
-  models.Cat:
+  models.Categoria:
     properties:
       codigo:
         type: string
@@ -52,7 +52,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.Cat'
+              $ref: '#/definitions/models.Categoria'
             type: array
       summary: Listar todas as categorias
       tags:
@@ -68,14 +68,14 @@ paths:
         name: cat
         required: true
         schema:
-          $ref: '#/definitions/models.Cat'
+          $ref: '#/definitions/models.Categoria'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.Cat'
+            $ref: '#/definitions/models.Categoria'
         "400":
           description: Erro ao decodificar a categoria
           schema:
@@ -133,7 +133,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.Cat'
+            $ref: '#/definitions/models.Categoria'
         "400":
           description: ID não fornecido ou inválido
           schema:
@@ -156,14 +156,14 @@ paths:
         name: cat
         required: true
         schema:
-          $ref: '#/definitions/models.Cat'
+          $ref: '#/definitions/models.Categoria'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.Cat'
+            $ref: '#/definitions/models.Categoria'
         "400":
           description: Erro ao decodificar a categoria
           schema:
