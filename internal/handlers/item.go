@@ -4,34 +4,31 @@ import (
 	"encoding/json"
 	"myapi/internal/config"
 	"myapi/internal/models"
+	"myapi/internal/repositories"
 	"myapi/internal/services"
 	"net/http"
 	"strconv"
+
+	"github.com/gorilla/mux"
 )
 
-func ListItensHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "GET" {
-		http.Error(w, "Método não permitido", http.StatusMethodNotAllowed)
-		return
-	}
+// Listar todos os itens
+func ListItens(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	var itens []models.Iten
-	if err := config.DB.Find(&itens).Error; err != nil {
-		http.Error(w, "Erro ao buscar itens", http.StatusInternalServerError)
+	repository := repositories.NewItemRepository()
+	items, err := repository.ListAll()
+	if err != nil {
+		http.Error(w, "erro ao listar os itens", http.StatusNotFound)
 		return
 	}
-	if err := json.NewEncoder(w).Encode(itens); err != nil {
-		http.Error(w, "Erro ao codificar os itens", http.StatusInternalServerError)
-	}
+	json.NewEncoder(w).Encode(items)
 }
 
-func GetItenHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "GET" {
-		http.Error(w, "Método não permitido", http.StatusMethodNotAllowed)
-		return
-	}
+// Buscar um único item pelo id
+func GetItem(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	idStr := r.URL.Query().Get("id")
+	vars := mux.Vars(r)
+	idStr := vars["id"]
 	if idStr == "" {
 		http.Error(w, "ID não fornecido", http.StatusBadRequest)
 		return
@@ -46,18 +43,14 @@ func GetItenHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Item não encontrado", http.StatusNotFound)
 		return
 	}
-	if err := json.NewEncoder(w).Encode(item); err != nil {
-		http.Error(w, "Erro ao codificar o item", http.StatusInternalServerError)
-	}
+	json.NewEncoder(w).Encode(item)
 }
 
-func GetItenByCodigoHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "GET" {
-		http.Error(w, "Método não permitido", http.StatusMethodNotAllowed)
-		return
-	}
+// Buscar um item pelo campo "codigo"
+func GetItemByCode(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	cod := r.URL.Query().Get("codigo")
+	vars := mux.Vars(r)
+	cod := vars["codigo"]
 	if cod == "" {
 		http.Error(w, "Código não fornecido", http.StatusBadRequest)
 		return
@@ -67,16 +60,11 @@ func GetItenByCodigoHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Item não encontrado", http.StatusNotFound)
 		return
 	}
-	if err := json.NewEncoder(w).Encode(item); err != nil {
-		http.Error(w, "Erro ao codificar o item", http.StatusInternalServerError)
-	}
+	json.NewEncoder(w).Encode(item)
 }
 
-func CreateItenHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
-		http.Error(w, "Método não permitido", http.StatusMethodNotAllowed)
-		return
-	}
+// Criar um novo item
+func CreateItem(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var item models.Iten
 	if err := json.NewDecoder(r.Body).Decode(&item); err != nil {
@@ -88,16 +76,15 @@ func CreateItenHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	if err := json.NewEncoder(w).Encode(createdItem); err != nil {
-		http.Error(w, "Erro ao codificar o item criado", http.StatusInternalServerError)
-	}
-}
-
-func UpdateItenHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "PUT" {
-		http.Error(w, "Método não permitido", http.StatusMethodNotAllowed)
+	if err := config.DB.Create(&createdItem).Error; err != nil {
+		http.Error(w, "Erro ao criar o item", http.StatusInternalServerError)
 		return
 	}
+	json.NewEncoder(w).Encode(createdItem)
+}
+
+// Atualizar um item
+func UpdateItem(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var item models.Iten
 	if err := json.NewDecoder(r.Body).Decode(&item); err != nil {
@@ -105,20 +92,16 @@ func UpdateItenHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := config.DB.Save(&item).Error; err != nil {
-		http.Error(w, "Erro ao atualizar the item", http.StatusInternalServerError)
+		http.Error(w, "Erro ao atualizar o item", http.StatusInternalServerError)
 		return
 	}
-	if err := json.NewEncoder(w).Encode(item); err != nil {
-		http.Error(w, "Erro ao codificar o item", http.StatusInternalServerError)
-	}
+	json.NewEncoder(w).Encode(item)
 }
 
-func DeleteItenHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "DELETE" {
-		http.Error(w, "Método não permitido", http.StatusMethodNotAllowed)
-		return
-	}
-	idStr := r.URL.Query().Get("id")
+// Deletar um item
+func DeleteItem(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	idStr := vars["id"]
 	if idStr == "" {
 		http.Error(w, "ID não fornecido", http.StatusBadRequest)
 		return
@@ -132,7 +115,6 @@ func DeleteItenHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Erro ao deletar o item", http.StatusInternalServerError)
 		return
 	}
-	if _, err := w.Write([]byte("Item deletado com sucesso")); err != nil {
-		http.Error(w, "Erro ao escrever resposta", http.StatusInternalServerError)
-	}
+	w.Write([]byte("Item deletado com sucesso"))
 }
+
