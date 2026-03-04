@@ -3,8 +3,8 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"myapi/internal/config"
 	"myapi/internal/models"
+	"myapi/internal/repositories"
 	"net/http"
 	"strconv"
 )
@@ -32,19 +32,16 @@ func ScalarHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func ListCategoriasHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	var categorias []models.Categoria
-	if err := config.DB.Find(&categorias).Error; err != nil {
+	repository := repositories.NewCategoriaRepository()
+	categorias, err := repository.ListAll()
+	if err != nil {
 		http.Error(w, "Erro ao buscar categorias", http.StatusInternalServerError)
 		return
 	}
-	if err := json.NewEncoder(w).Encode(categorias); err != nil {
-		http.Error(w, "Erro ao codificar categorias", http.StatusInternalServerError)
-	}
+	json.NewEncoder(w).Encode(categorias)
 }
 
 func GetCategoriaHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
 	idStr := r.URL.Query().Get("id")
 	if idStr == "" {
 		http.Error(w, "ID não fornecido", http.StatusBadRequest)
@@ -55,46 +52,45 @@ func GetCategoriaHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "ID inválido", http.StatusBadRequest)
 		return
 	}
-	var categorias models.Categoria
-	if err := config.DB.First(&categorias, id).Error; err != nil {
+
+	repository := repositories.NewCategoriaRepository()
+	categoria, err := repository.GetByID(id)
+	if err != nil {
 		http.Error(w, "Categoria não encontrada", http.StatusNotFound)
 		return
 	}
-	if err := json.NewEncoder(w).Encode(categorias); err != nil {
-		http.Error(w, "Erro ao codificar categoria", http.StatusInternalServerError)
-	}
+	json.NewEncoder(w).Encode(categoria)
 }
 
 func CreateCategoriaHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	var categorias models.Categoria
-	if err := json.NewDecoder(r.Body).Decode(&categorias); err != nil {
+	var categoria models.Categoria
+	if err := json.NewDecoder(r.Body).Decode(&categoria); err != nil {
 		http.Error(w, "Erro ao decodificar a categoria", http.StatusBadRequest)
 		return
 	}
-	if err := config.DB.Create(&categorias).Error; err != nil {
+
+	repository := repositories.NewCategoriaRepository()
+	createdCategoria, err := repository.Create(&categoria)
+	if err != nil {
 		http.Error(w, "Erro ao criar a categoria", http.StatusInternalServerError)
 		return
 	}
-	if err := json.NewEncoder(w).Encode(categorias); err != nil {
-		http.Error(w, "Erro ao codificar categoria criada", http.StatusInternalServerError)
-	}
+	json.NewEncoder(w).Encode(createdCategoria)
 }
 
 func UpdateCategoriaHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	var categorias models.Categoria
-	if err := json.NewDecoder(r.Body).Decode(&categorias); err != nil {
+	var categoria models.Categoria
+	if err := json.NewDecoder(r.Body).Decode(&categoria); err != nil {
 		http.Error(w, "Erro ao decodificar a categoria", http.StatusBadRequest)
 		return
 	}
-	if err := config.DB.Save(&categorias).Error; err != nil {
-		http.Error(w, "Erro ao atualizar a categoria", http.StatusInternalServerError)
+
+	repository := repositories.NewCategoriaRepository()
+	if err := repository.Update(&categoria); err != nil {
+		http.Error(w, "Erro ao atualizar the categoria", http.StatusInternalServerError)
 		return
 	}
-	if err := json.NewEncoder(w).Encode(categorias); err != nil {
-		http.Error(w, "Erro ao codificar categoria atualizada", http.StatusInternalServerError)
-	}
+	json.NewEncoder(w).Encode(categoria)
 }
 
 func DeleteCategoriaHandler(w http.ResponseWriter, r *http.Request) {
@@ -108,11 +104,11 @@ func DeleteCategoriaHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "ID inválido", http.StatusBadRequest)
 		return
 	}
-	if err := config.DB.Delete(&models.Categoria{}, id).Error; err != nil {
+
+	repository := repositories.NewCategoriaRepository()
+	if err := repository.Delete(id); err != nil {
 		http.Error(w, "Erro ao deletar a categoria", http.StatusInternalServerError)
 		return
 	}
-	if _, err := w.Write([]byte("Categoria deletada com sucesso")); err != nil {
-		http.Error(w, "Erro ao escrever resposta", http.StatusInternalServerError)
-	}
+	w.Write([]byte("Categoria deletada com sucesso"))
 }
